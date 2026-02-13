@@ -1,1 +1,1644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Element Study Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .mode-selector {
+            text-align: center;
+        }
+
+        .mode-buttons {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 30px 20px;
+            border: 3px solid #667eea;
+            background: white;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .mode-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .mode-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .mode-description {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .mode-btn:hover .mode-description {
+            color: white;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .game-area {
+            text-align: center;
+        }
+
+        .mode-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            background: #667eea;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .mode-badge.test {
+            background: #e74c3c;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1em;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        input:disabled {
+            background: #f5f5f5;
+        }
+
+        input.correct {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        input.incorrect {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            min-width: 120px;
+        }
+
+        .submit-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background: #218838;
+        }
+
+        .skip-btn {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .skip-btn:hover:not(:disabled) {
+            background: #e0a800;
+        }
+
+        .hint-btn {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .hint-btn:hover:not(:disabled) {
+            background: #138496;
+        }
+
+        .show-answer-btn {
+            background: #6c757d;
+            color: white;
+        }
+
+        .show-answer-btn:hover:not(:disabled) {
+            background: #5a6268;
+        }
+
+        .audio-btn {
+            background: #764ba2;
+            color: white;
+            padding: 15px;
+            font-size: 1.2em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            flex: 0.5;
+        }
+
+        .audio-btn:hover:not(:disabled) {
+            background: #6a4292;
+            transform: scale(1.05);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .feedback.hint {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .complete-screen {
+            display: none;
+            text-align: center;
+        }
+
+        .complete-screen.show {
+            display: block;
+        }
+
+        .complete-screen h2 {
+            color: #28a745;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .final-stats {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .final-stat {
+            font-size: 1.5em;
+            margin: 10px 0;
+            color: #333;
+        }
+
+        .restart-btn {
+            background: #667eea;
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.2em;
+        }
+
+        .restart-btn:hover {
+            background: #5568d3;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .main-menu {
+            display: block;
+        }
+
+        .main-menu.hidden {
+            display: none;
+        }
+
+        .menu-btn {
+            padding: 30px 20px;
+            border: 3px solid #667eea;
+            background: white;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .menu-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .study-set-card {
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+            position: relative;
+        }
+
+        .study-set-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .delete-set-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            opacity: 0;
+        }
+
+        .study-set-card:hover .delete-set-btn {
+            opacity: 1;
+        }
+
+        .delete-set-btn:hover {
+            background: #c82333;
+            transform: scale(1.1);
+        }
+
+        .study-set-card h3 {
+            color: #667eea;
+            margin: 0 0 8px 0;
+            font-size: 1.2em;
+        }
+
+        .study-set-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .study-set-progress {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            font-size: 0.85em;
+        }
+
+        .progress-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .progress-dot.mastered {
+            background: #28a745;
+        }
+
+        .progress-dot.learning {
+            background: #ffc107;
+        }
+
+        .progress-dot.new {
+            background: #6c757d;
+        }
+
+        .back-btn {
+            padding: 12px 24px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .report-stat-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .report-stat-title {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .report-stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .report-stat-description {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .report-element-list {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .element-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9em;
+        }
+
+        .element-item:last-child {
+            border-bottom: none;
+        }
+
+        .element-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .element-stats {
+            display: flex;
+            gap: 15px;
+            color: #666;
+        }
+
+        .element-mastered {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .element-learning {
+            color: #ffc107;
+            font-weight: 600;
+        }
+
+        .element-new {
+            color: #6c757d;
+            font-weight: 600;
+        }
+
+        .readiness-meter {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .readiness-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #dc3545 0%, #ffc107 50%, #28a745 100%);
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .readiness-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 8px;
+        }
+
+        .mode-selector.hidden {
+            display: none;
+        }
+
+        .add-set-btn {
+            padding: 12px 24px;
+            border: 2px dashed #667eea;
+            background: transparent;
+            color: #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .add-set-btn:hover {
+            background: #f0f2f8;
+            border-color: #5568d3;
+            color: #5568d3;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.hidden {
+            display: none;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .modal-content textarea {
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Element Study Game</h1>
+        
+        <div id="mainMenu" class="main-menu">
+            <div style="display: flex; gap: 10px; margin-bottom: 30px;">
+                <button class="menu-btn" onclick="showStudySets()" style="flex: 1;">
+                    <div style="font-size: 2em; margin-bottom: 10px;">📚</div>
+                    <div>Study</div>
+                </button>
+                <button class="menu-btn" onclick="showReports()" style="flex: 1;">
+                    <div style="font-size: 2em; margin-bottom: 10px;">📊</div>
+                    <div>Progress Report</div>
+                </button>
+            </div>
+        </div>
+
+        <div id="studySetsScreen" class="hidden">
+            <h2 style="color: #667eea; margin-bottom: 20px; font-size: 1.5em;">📚 Select Study Set</h2>
+            <div id="studySetsContainer" style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- Sets will be populated here -->
+            </div>
+            <button class="add-set-btn" onclick="showAddSetModal()" style="width: 100%; margin-top: 15px; margin-bottom: 10px;">+ Add New Study Set</button>
+            <button class="back-btn" onclick="backToMenu()" style="width: 100%; margin-bottom: 0;">← Back</button>
+        </div>
+
+        <div id="addSetModal" class="modal hidden">
+            <div class="modal-content">
+                <h2 style="color: #667eea; margin-bottom: 20px;">Create New Study Set</h2>
+                
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <label style="margin-bottom: 8px; display: block;">Set Name:</label>
+                    <input type="text" id="setNameInput" placeholder="e.g., Chapter 2 Elements" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 1em;">
+                </div>
+
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <label style="margin-bottom: 8px; display: block;">Description (optional):</label>
+                    <input type="text" id="setDescInput" placeholder="e.g., Elements 20-40" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 1em;">
+                </div>
+
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <label style="margin-bottom: 8px; display: block;">Select Elements (comma-separated atomic numbers or ranges):</label>
+                    <textarea id="setElementsInput" placeholder="e.g., 1-20, 24-36, 22, 38, 42, 43, 92, 95, 99, 101, 47-54, 55-57, 74, 77-89" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 1em; min-height: 80px; font-family: monospace;"></textarea>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button class="submit-btn" onclick="createNewSet()" style="flex: 1;">Create Set</button>
+                    <button class="skip-btn" onclick="closeAddSetModal()" style="flex: 1;">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="modeSelector" class="mode-selector hidden">
+            <p style="color: #666; margin-bottom: 20px;">Choose your mode for <strong id="selectedSetName"></strong>:</p>
+            <div class="mode-buttons">
+                <div class="mode-btn" onclick="startMode('study')">
+                    <div class="mode-icon">📚</div>
+                    <div>Study Mode</div>
+                    <div class="mode-description">Practice with hints and answers available</div>
+                </div>
+                <div class="mode-btn" onclick="startMode('test')">
+                    <div class="mode-icon">✅</div>
+                    <div>Test Mode</div>
+                    <div class="mode-description">Challenge yourself without help</div>
+                </div>
+            </div>
+            <button class="back-btn" onclick="backFromModeSelector()" style="width: 100%; margin-top: 20px;">← Back</button>
+        </div>
+
+        <div id="reportScreen" class="hidden">
+            <h2 style="color: #667eea; margin-bottom: 20px; font-size: 1.5em;">📊 Your Progress Report</h2>
+            <div id="reportContent" style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                <!-- Report will be populated here -->
+            </div>
+            <button class="back-btn" onclick="backToMenu()" style="width: 100%; margin-top: 20px;">← Back</button>
+        </div>
+
+        <div id="gameContainer" class="hidden">
+            <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 15px; position: relative;">
+                <div class="mode-badge" id="modeBadge">Study Mode</div>
+                <button class="back-btn" onclick="backFromGame()" style="position: absolute; right: 0; padding: 8px 12px; font-size: 0.85em; border: 1px solid #667eea;">← Back</button>
+            </div>
+            
+            <div style="text-align: center; margin-bottom: 20px;">
+                <label for="voiceSelect" style="display: inline; margin-right: 10px;">Voice:</label>
+                <select id="voiceSelect" style="padding: 8px; border-radius: 5px; border: 2px solid #ddd; font-size: 0.9em;">
+                    <option value="">Loading voices...</option>
+                </select>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div id="gameScreen">
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-number" id="currentNum">1</div>
+                        <div class="stat-label">Attempts</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" id="correctNum">0</div>
+                        <div class="stat-label">Mastered</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" id="totalNum">89</div>
+                        <div class="stat-label">Total</div>
+                    </div>
+                </div>
+
+                <div class="game-area">
+                    <div class="input-group">
+                        <label for="elementName">Element Name:</label>
+                        <input type="text" id="elementName" placeholder="Type the element name" autocomplete="off">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="elementSymbol">Element Symbol:</label>
+                        <input type="text" id="elementSymbol" placeholder="Type the element symbol" autocomplete="off">
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="submit-btn" id="submitBtn">Submit</button>
+                        <button class="skip-btn" id="skipBtn">Skip</button>
+                        <button class="audio-btn" id="playAudio">🔊</button>
+                    </div>
+
+                    <div class="btn-group" id="studyButtons" style="display: none;">
+                        <button class="hint-btn" id="hintBtn">💡 Hint</button>
+                        <button class="show-answer-btn" id="showAnswerBtn">👁️ Show Answer</button>
+                    </div>
+
+                    <div class="feedback" id="feedback"></div>
+                </div>
+            </div>
+
+            <div class="complete-screen" id="completeScreen">
+                <h2>🎉 Complete!</h2>
+                <div class="final-stats">
+                    <div class="final-stat">Score: <span id="finalScore"></span></div>
+                    <div class="final-stat">Time: <span id="finalAccuracy"></span></div>
+                </div>
+                <button class="restart-btn" id="restartBtn">Back to Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Study Sets Definition
+        let studySets = {
+            'mr-swamy-quiz-1': {
+                name: 'Mr. Swamy Quiz #1',
+                description: 'All 89 elements',
+                elements: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 22, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 38, 42, 43, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 92, 94, 95, 99, 101]
+            }
+        };
+
+        // Load custom study sets from localStorage
+        function loadStudySets() {
+            const saved = localStorage.getItem('studySets');
+            if (saved) {
+                const customSets = JSON.parse(saved);
+                studySets = { ...studySets, ...customSets };
+            }
+        }
+
+        // Load on init
+        loadStudySets();
+
+        const elements = {
+            1: { name: 'Hydrogen', symbol: 'H', ipa: 'ˈhaɪdrədʒən' },
+            2: { name: 'Helium', symbol: 'He', ipa: 'ˈhiːliəm' },
+            3: { name: 'Lithium', symbol: 'Li', ipa: 'ˈlɪθiəm' },
+            4: { name: 'Beryllium', symbol: 'Be', ipa: 'bəˈrɪliəm' },
+            5: { name: 'Boron', symbol: 'B', ipa: 'ˈbɔːrɒn' },
+            6: { name: 'Carbon', symbol: 'C', ipa: 'ˈkɑːrbən' },
+            7: { name: 'Nitrogen', symbol: 'N', ipa: 'ˈnaɪtrədʒən' },
+            8: { name: 'Oxygen', symbol: 'O', ipa: 'ˈɒksɪdʒən' },
+            9: { name: 'Fluorine', symbol: 'F', ipa: 'ˈflʊəriːn' },
+            10: { name: 'Neon', symbol: 'Ne', ipa: 'ˈniːɒn' },
+            11: { name: 'Sodium', symbol: 'Na', ipa: 'ˈsoʊdiəm' },
+            12: { name: 'Magnesium', symbol: 'Mg', ipa: 'mæɡˈniːziəm' },
+            13: { name: 'Aluminum', symbol: 'Al', ipa: 'əˈluːmɪnəm' },
+            14: { name: 'Silicon', symbol: 'Si', ipa: 'ˈsɪlɪkən' },
+            15: { name: 'Phosphorus', symbol: 'P', ipa: 'ˈfɒsfərəs' },
+            16: { name: 'Sulfur', symbol: 'S', ipa: 'ˈsʌlfər' },
+            17: { name: 'Chlorine', symbol: 'Cl', ipa: 'ˈklɔːriːn' },
+            18: { name: 'Argon', symbol: 'Ar', ipa: 'ˈɑːrɡɒn' },
+            19: { name: 'Potassium', symbol: 'K', ipa: 'pəˈtæsiəm' },
+            20: { name: 'Calcium', symbol: 'Ca', ipa: 'ˈkælsiəm' },
+            21: { name: 'Scandium', symbol: 'Sc', ipa: 'ˈskændiəm' },
+            22: { name: 'Titanium', symbol: 'Ti', ipa: 'taɪˈteɪniəm' },
+            23: { name: 'Vanadium', symbol: 'V', ipa: 'vəˈneɪdiəm' },
+            24: { name: 'Chromium', symbol: 'Cr', ipa: 'ˈkroʊmiəm' },
+            25: { name: 'Manganese', symbol: 'Mn', ipa: 'ˈmæŋɡəniːz' },
+            26: { name: 'Iron', symbol: 'Fe', ipa: 'ˈaɪərn' },
+            27: { name: 'Cobalt', symbol: 'Co', ipa: 'ˈkoʊbɔːlt' },
+            28: { name: 'Nickel', symbol: 'Ni', ipa: 'ˈnɪkəl' },
+            29: { name: 'Copper', symbol: 'Cu', ipa: 'ˈkɒpər' },
+            30: { name: 'Zinc', symbol: 'Zn', ipa: 'zɪŋk' },
+            31: { name: 'Gallium', symbol: 'Ga', ipa: 'ˈɡæliəm' },
+            32: { name: 'Germanium', symbol: 'Ge', ipa: 'dʒərˈmeɪniəm' },
+            33: { name: 'Arsenic', symbol: 'As', ipa: 'ˈɑːrsənɪk' },
+            34: { name: 'Selenium', symbol: 'Se', ipa: 'səˈliːniəm' },
+            35: { name: 'Bromine', symbol: 'Br', ipa: 'ˈbroʊmiːn' },
+            36: { name: 'Krypton', symbol: 'Kr', ipa: 'ˈkrɪptɒn' },
+            37: { name: 'Rubidium', symbol: 'Rb', ipa: 'ruːˈbɪdiəm' },
+            38: { name: 'Strontium', symbol: 'Sr', ipa: 'ˈstrɒnʃiəm' },
+            39: { name: 'Yttrium', symbol: 'Y', ipa: 'ˈɪtriəm' },
+            40: { name: 'Zirconium', symbol: 'Zr', ipa: 'zərˈkoʊniəm' },
+            41: { name: 'Niobium', symbol: 'Nb', ipa: 'naɪˈoʊbiəm' },
+            42: { name: 'Molybdenum', symbol: 'Mo', ipa: 'məˈlɪbdənəm' },
+            43: { name: 'Technetium', symbol: 'Tc', ipa: 'tɛkˈniːʃiəm' },
+            44: { name: 'Ruthenium', symbol: 'Ru', ipa: 'ruːˈθiːniəm' },
+            45: { name: 'Rhodium', symbol: 'Rh', ipa: 'ˈroʊdiəm' },
+            46: { name: 'Palladium', symbol: 'Pd', ipa: 'pəˈleɪdiəm' },
+            47: { name: 'Silver', symbol: 'Ag', ipa: 'ˈsɪlvər' },
+            48: { name: 'Cadmium', symbol: 'Cd', ipa: 'ˈkædmiəm' },
+            49: { name: 'Indium', symbol: 'In', ipa: 'ˈɪndiəm' },
+            50: { name: 'Tin', symbol: 'Sn', ipa: 'tɪn' },
+            51: { name: 'Antimony', symbol: 'Sb', ipa: 'ˈæntɪmoʊni' },
+            52: { name: 'Tellurium', symbol: 'Te', ipa: 'təˈlʊriəm' },
+            53: { name: 'Iodine', symbol: 'I', ipa: 'ˈaɪədiːn' },
+            54: { name: 'Xenon', symbol: 'Xe', ipa: 'ˈziːnɒn' },
+            55: { name: 'Cesium', symbol: 'Cs', ipa: 'ˈsiːziəm' },
+            56: { name: 'Barium', symbol: 'Ba', ipa: 'ˈbɛəriəm' },
+            57: { name: 'Lanthanum', symbol: 'La', ipa: 'ˈlænθənəm' },
+            58: { name: 'Cerium', symbol: 'Ce', ipa: 'ˈsɪəriəm' },
+            59: { name: 'Praseodymium', symbol: 'Pr', ipa: 'ˌpreɪzioʊˈdɪmiəm' },
+            60: { name: 'Neodymium', symbol: 'Nd', ipa: 'ˌniːoʊˈdɪmiəm' },
+            61: { name: 'Promethium', symbol: 'Pm', ipa: 'prəˈmiːθiəm' },
+            62: { name: 'Samarium', symbol: 'Sm', ipa: 'səˈmɛəriəm' },
+            63: { name: 'Europium', symbol: 'Eu', ipa: 'jʊˈroʊpiəm' },
+            64: { name: 'Gadolinium', symbol: 'Gd', ipa: 'ˌɡædəˈlɪniəm' },
+            65: { name: 'Terbium', symbol: 'Tb', ipa: 'ˈtɜːrbiəm' },
+            66: { name: 'Dysprosium', symbol: 'Dy', ipa: 'dɪsˈproʊziəm' },
+            67: { name: 'Holmium', symbol: 'Ho', ipa: 'ˈhoʊlmiəm' },
+            68: { name: 'Erbium', symbol: 'Er', ipa: 'ˈɜːrbiəm' },
+            69: { name: 'Thulium', symbol: 'Tm', ipa: 'ˈθuːliəm' },
+            70: { name: 'Ytterbium', symbol: 'Yb', ipa: 'ɪˈtɜːrbiəm' },
+            71: { name: 'Lutetium', symbol: 'Lu', ipa: 'luːˈtiːʃiəm' },
+            72: { name: 'Hafnium', symbol: 'Hf', ipa: 'ˈhæfniəm' },
+            73: { name: 'Tantalum', symbol: 'Ta', ipa: 'ˈtæntələm' },
+            74: { name: 'Tungsten', symbol: 'W', ipa: 'ˈtʌŋstən' },
+            75: { name: 'Rhenium', symbol: 'Re', ipa: 'ˈriːniəm' },
+            76: { name: 'Osmium', symbol: 'Os', ipa: 'ˈɒzmiəm' },
+            77: { name: 'Iridium', symbol: 'Ir', ipa: 'ɪˈrɪdiəm' },
+            78: { name: 'Platinum', symbol: 'Pt', ipa: 'ˈplætɪnəm' },
+            79: { name: 'Gold', symbol: 'Au', ipa: 'ɡoʊld' },
+            80: { name: 'Mercury', symbol: 'Hg', ipa: 'ˈmɜːrkjəri' },
+            81: { name: 'Thallium', symbol: 'Tl', ipa: 'ˈθæliəm' },
+            82: { name: 'Lead', symbol: 'Pb', ipa: 'lɛd' },
+            83: { name: 'Bismuth', symbol: 'Bi', ipa: 'ˈbɪzməθ' },
+            84: { name: 'Polonium', symbol: 'Po', ipa: 'pəˈloʊniəm' },
+            85: { name: 'Astatine', symbol: 'At', ipa: 'ˈæstətiːn' },
+            86: { name: 'Radon', symbol: 'Rn', ipa: 'ˈreɪdɒn' },
+            87: { name: 'Francium', symbol: 'Fr', ipa: 'ˈfrænsium' },
+            88: { name: 'Radium', symbol: 'Ra', ipa: 'ˈreɪdiəm' },
+            89: { name: 'Actinium', symbol: 'Ac', ipa: 'ækˈtɪniəm' },
+            90: { name: 'Thorium', symbol: 'Th', ipa: 'ˈθɔːriəm' },
+            91: { name: 'Protactinium', symbol: 'Pa', ipa: 'ˌproʊtækˈtɪniəm' },
+            92: { name: 'Uranium', symbol: 'U', ipa: 'jʊˈreɪniəm' },
+            93: { name: 'Neptunium', symbol: 'Np', ipa: 'nɛpˈtuːniəm' },
+            94: { name: 'Plutonium', symbol: 'Pu', ipa: 'pluːˈtoʊniəm' },
+            95: { name: 'Americium', symbol: 'Am', ipa: 'ˌæməˈrɪsiəm' },
+            96: { name: 'Curium', symbol: 'Cm', ipa: 'ˈkjʊriəm' },
+            97: { name: 'Berkelium', symbol: 'Bk', ipa: 'ˈbɜːrkliəm' },
+            98: { name: 'Californium', symbol: 'Cf', ipa: 'ˌkælɪˈfɔːrniəm' },
+            99: { name: 'Einsteinium', symbol: 'Es', ipa: 'aɪnˈstaɪniəm' },
+            100: { name: 'Fermium', symbol: 'Fm', ipa: 'ˈfɜːrmiəm' },
+            101: { name: 'Mendelevium', symbol: 'Md', ipa: 'ˌmɛndəˈliːviəm' },
+            102: { name: 'Nobelium', symbol: 'No', ipa: 'noʊˈbeɪliəm' },
+            103: { name: 'Lawrencium', symbol: 'Lr', ipa: 'ˈlɔːrənsiəm' },
+            104: { name: 'Rutherfordium', symbol: 'Rf', ipa: 'ˌruːðərˈfɔːrdiəm' },
+            105: { name: 'Dubnium', symbol: 'Db', ipa: 'ˈduːbniəm' },
+            106: { name: 'Seaborgium', symbol: 'Sg', ipa: 'ˈsiːbɔːrɡiəm' },
+            107: { name: 'Bohrium', symbol: 'Bh', ipa: 'ˈboʊriəm' },
+            108: { name: 'Hassium', symbol: 'Hs', ipa: 'ˈhæsiəm' },
+            109: { name: 'Meitnerium', symbol: 'Mt', ipa: 'maɪtˈnɛriəm' },
+            110: { name: 'Darmstadtium', symbol: 'Ds', ipa: 'dɑːrmˈʃtætɪəm' },
+            111: { name: 'Roentgenium', symbol: 'Rg', ipa: 'ˈrɛntɡiniəm' },
+            112: { name: 'Copernicium', symbol: 'Cn', ipa: 'kɑːpərˈnɪʃiəm' },
+            113: { name: 'Nihonium', symbol: 'Nh', ipa: 'nɪˈhoʊniəm' },
+            114: { name: 'Flerovium', symbol: 'Fl', ipa: 'ˈflɛroʊviəm' },
+            115: { name: 'Moscovium', symbol: 'Mc', ipa: 'moʊˈskaʊviəm' },
+            116: { name: 'Livermorium', symbol: 'Lv', ipa: 'ˌlɪvərˈmɔːriəm' },
+            117: { name: 'Tennessine', symbol: 'Ts', ipa: 'tɛˈnɛsiːn' },
+            118: { name: 'Oganesson', symbol: 'Og', ipa: 'ˌoʊɡəˈnɛsən' }
+        };
+
+        // Game state
+        let elementStats = {};
+        let currentElement = null;
+        let totalAnswered = 0;
+        let sessionStartTime = Date.now();
+        let gameMode = 'study'; // 'study' or 'test'
+
+        // DOM elements
+        const mainMenu = document.getElementById('mainMenu');
+        const modeSelector = document.getElementById('modeSelector');
+        const gameContainer = document.getElementById('gameContainer');
+        const studySetsScreen = document.getElementById('studySetsScreen');
+        const reportScreen = document.getElementById('reportScreen');
+        const modeBadge = document.getElementById('modeBadge');
+        const voiceSelect = document.getElementById('voiceSelect');
+        const elementNameInput = document.getElementById('elementName');
+        const elementSymbolInput = document.getElementById('elementSymbol');
+        const submitBtn = document.getElementById('submitBtn');
+        const skipBtn = document.getElementById('skipBtn');
+        const hintBtn = document.getElementById('hintBtn');
+        const showAnswerBtn = document.getElementById('showAnswerBtn');
+        const studyButtons = document.getElementById('studyButtons');
+        const feedback = document.getElementById('feedback');
+        const gameScreen = document.getElementById('gameScreen');
+        const completeScreen = document.getElementById('completeScreen');
+        const restartBtn = document.getElementById('restartBtn');
+        const playAudioBtn = document.getElementById('playAudio');
+
+        let availableVoices = [];
+        let selectedVoice = null;
+
+        // Load and populate voices
+        function loadVoices() {
+            availableVoices = speechSynthesis.getVoices();
+            
+            if (availableVoices.length > 0) {
+                voiceSelect.innerHTML = '';
+                
+                // Filter to English voices and sort by quality
+                const englishVoices = availableVoices.filter(v => v.lang.startsWith('en'));
+                
+                // Prioritize certain high-quality voices
+                const sortedVoices = englishVoices.sort((a, b) => {
+                    const aScore = getVoiceQualityScore(a);
+                    const bScore = getVoiceQualityScore(b);
+                    return bScore - aScore;
+                });
+                
+                sortedVoices.forEach((voice, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    voiceSelect.appendChild(option);
+                });
+                
+                // Auto-select the best voice
+                voiceSelect.value = 0;
+                selectedVoice = sortedVoices[0];
+            }
+        }
+
+        function getVoiceQualityScore(voice) {
+            let score = 0;
+            const name = voice.name.toLowerCase();
+            
+            // Mac premium voices
+            if (name.includes('samantha')) score += 100;
+            if (name.includes('alex')) score += 90;
+            if (name.includes('allison')) score += 85;
+            if (name.includes('ava')) score += 85;
+            if (name.includes('susan')) score += 80;
+            if (name.includes('karen')) score += 75;
+            
+            // Google voices
+            if (name.includes('google')) score += 70;
+            
+            // Microsoft voices
+            if (name.includes('zira')) score += 60;
+            if (name.includes('david')) score += 60;
+            
+            // Premium/Enhanced indicators
+            if (name.includes('premium')) score += 50;
+            if (name.includes('enhanced')) score += 40;
+            if (name.includes('natural')) score += 30;
+            
+            // Prefer US English
+            if (voice.lang === 'en-US') score += 20;
+            
+            // Local voices are often higher quality
+            if (voice.localService) score += 10;
+            
+            return score;
+        }
+
+        // Update selected voice when dropdown changes
+        voiceSelect.addEventListener('change', function() {
+            const voices = speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
+            const sortedVoices = voices.sort((a, b) => {
+                return getVoiceQualityScore(b) - getVoiceQualityScore(a);
+            });
+            selectedVoice = sortedVoices[this.value];
+        });
+
+        // Load voices on page load and when they change
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = loadVoices;
+        }
+        loadVoices();
+
+        let currentStudySetId = null;
+        let studySetElements = [];
+
+        function backToMenu() {
+            mainMenu.classList.remove('hidden');
+            studySetsScreen.classList.add('hidden');
+            reportScreen.classList.add('hidden');
+            modeSelector.classList.add('hidden');
+            gameContainer.classList.add('hidden');
+        }
+
+        function backFromModeSelector() {
+            modeSelector.classList.add('hidden');
+            studySetsScreen.classList.remove('hidden');
+        }
+
+        function backFromGame() {
+            gameContainer.classList.add('hidden');
+            studySetsScreen.classList.remove('hidden');
+            // Reset the game state
+            currentStudySetId = null;
+            studySetElements = [];
+        }
+
+        function showAddSetModal() {
+            document.getElementById('addSetModal').classList.remove('hidden');
+            document.getElementById('setNameInput').focus();
+        }
+
+        function closeAddSetModal() {
+            document.getElementById('addSetModal').classList.add('hidden');
+            document.getElementById('setNameInput').value = '';
+            document.getElementById('setDescInput').value = '';
+            document.getElementById('setElementsInput').value = '';
+        }
+
+        function createNewSet() {
+            const name = document.getElementById('setNameInput').value.trim();
+            const description = document.getElementById('setDescInput').value.trim();
+            const elementsStr = document.getElementById('setElementsInput').value.trim();
+
+            if (!name) {
+                alert('Please enter a set name');
+                return;
+            }
+
+            if (!elementsStr) {
+                alert('Please enter element numbers');
+                return;
+            }
+
+            // Parse elements with support for ranges (e.g., 1-20, 24-36, 42)
+            const elementArray = [];
+            const parts = elementsStr.split(',');
+            
+            parts.forEach(part => {
+                part = part.trim();
+                if (!part) return;
+                
+                if (part.includes('-')) {
+                    // Handle range notation (e.g., 1-20)
+                    const [start, end] = part.split('-').map(p => parseInt(p.trim()));
+                    if (!isNaN(start) && !isNaN(end)) {
+                        const min = Math.min(start, end);
+                        const max = Math.max(start, end);
+                        for (let i = min; i <= max; i++) {
+                            if (!elementArray.includes(i)) {
+                                elementArray.push(i);
+                            }
+                        }
+                    }
+                } else {
+                    // Handle individual number
+                    const num = parseInt(part);
+                    if (!isNaN(num) && !elementArray.includes(num)) {
+                        elementArray.push(num);
+                    }
+                }
+            });
+
+            if (elementArray.length === 0) {
+                alert('Please enter valid element numbers or ranges');
+                return;
+            }
+
+            // Create unique ID for the set
+            const setId = 'custom-' + Date.now();
+            
+            studySets[setId] = {
+                name: name,
+                description: description || `${elementArray.length} elements`,
+                elements: elementArray
+            };
+
+            // Save to localStorage
+            localStorage.setItem('studySets', JSON.stringify(studySets));
+
+            closeAddSetModal();
+            showStudySets(); // Refresh the sets list
+        }
+
+        function showStudySets() {
+            mainMenu.classList.add('hidden');
+            studySetsScreen.classList.remove('hidden');
+            
+            const container = document.getElementById('studySetsContainer');
+            container.innerHTML = '';
+            
+            Object.entries(studySets).forEach(([setId, setData]) => {
+                const stats = getSetStats(setData.elements);
+                const card = document.createElement('div');
+                card.className = 'study-set-card';
+                card.onclick = () => selectStudySet(setId);
+                
+                const progressPercentage = setData.elements.length > 0 
+                    ? Math.round((stats.mastered / setData.elements.length) * 100) 
+                    : 0;
+                
+                const isCustom = setId.startsWith('custom-');
+                card.innerHTML = `
+                    ${isCustom ? `<button class="delete-set-btn" onclick="event.stopPropagation(); deleteStudySet('${setId}')">×</button>` : ''}
+                    <h3>${setData.name}</h3>
+                    <div class="study-set-info">
+                        <span>${setData.elements.length} elements</span>
+                        <span style="color: #667eea; font-weight: 600;">${progressPercentage}% complete</span>
+                    </div>
+                    <div class="study-set-progress">
+                        <div class="progress-item">
+                            <div class="progress-dot mastered"></div>
+                            <span>${stats.mastered} mastered</span>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-dot learning"></div>
+                            <span>${stats.learning} learning</span>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-dot new"></div>
+                            <span>${stats.new} new</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function getSetStats(elementIds) {
+            let mastered = 0, learning = 0, newCount = 0;
+            
+            elementIds.forEach(id => {
+                const stat = elementStats[id];
+                if (!stat) return;
+                
+                if (stat.consecutiveCorrect >= 2) {
+                    mastered++;
+                } else if (stat.attempts > 0) {
+                    learning++;
+                } else {
+                    newCount++;
+                }
+            });
+            
+            return { mastered, learning, new: newCount };
+        }
+
+        function selectStudySet(setId) {
+            currentStudySetId = setId;
+            studySetElements = [...studySets[setId].elements];
+            
+            // Update mode selector to show the set name
+            document.getElementById('selectedSetName').textContent = studySets[setId].name;
+            
+            studySetsScreen.classList.add('hidden');
+            modeSelector.classList.remove('hidden');
+        }
+
+        function deleteStudySet(setId) {
+            if (confirm('Are you sure you want to delete this study set? This action cannot be undone.')) {
+                delete studySets[setId];
+                localStorage.setItem('studySets', JSON.stringify(studySets));
+                showStudySets();
+            }
+        }
+
+        function showReports() {
+            mainMenu.classList.add('hidden');
+            reportScreen.classList.remove('hidden');
+            
+            const reportContent = document.getElementById('reportContent');
+            
+            // Build report for each study set
+            let html = '<div style="display: flex; flex-direction: column; gap: 20px;">';
+            
+            Object.entries(studySets).forEach(([setId, setData]) => {
+                const setElementIds = setData.elements;
+                
+                let setStats = {};
+                setElementIds.forEach(id => {
+                    setStats[id] = elementStats[id] || {
+                        attempts: 0,
+                        correct: 0,
+                        consecutiveCorrect: 0,
+                        lastSeen: 0
+                    };
+                });
+                
+                const totalAttempts = Object.values(setStats).reduce((sum, s) => sum + s.attempts, 0);
+                const totalCorrect = Object.values(setStats).reduce((sum, s) => sum + s.correct, 0);
+                const mastered = Object.values(setStats).filter(s => s.consecutiveCorrect >= 2).length;
+                const learning = Object.values(setStats).filter(s => s.attempts > 0 && s.consecutiveCorrect < 2).length;
+                const newElements = Object.values(setStats).filter(s => s.attempts === 0).length;
+                
+                const accuracy = totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0;
+                const readiness = mastered > 0 ? Math.round((mastered / setElementIds.length) * 100) : 0;
+                
+                const readinessStatus = readiness >= 80 ? '🟢 Ready!' : readiness >= 50 ? '🟡 Getting there...' : '🔴 Keep studying';
+                
+                html += `
+                    <div style="background: white; padding: 20px; border-radius: 10px; border-top: 4px solid #667eea;">
+                        <h3 style="color: #667eea; margin-bottom: 15px; font-size: 1.1em;">${setData.name}</h3>
+                        
+                        <div class="report-grid">
+                            <div class="report-stat-box" style="border-left: none; background: transparent; padding: 0;">
+                                <div class="report-stat-title">Mastered</div>
+                                <div class="report-stat-value" style="color: #28a745;">${mastered}/${setElementIds.length}</div>
+                            </div>
+                            <div class="report-stat-box" style="border-left: none; background: transparent; padding: 0;">
+                                <div class="report-stat-title">Accuracy</div>
+                                <div class="report-stat-value" style="color: #667eea;">${accuracy}%</div>
+                            </div>
+                            <div class="report-stat-box" style="border-left: none; background: transparent; padding: 0;">
+                                <div class="report-stat-title">Learning</div>
+                                <div class="report-stat-value" style="color: #ffc107;">${learning}</div>
+                            </div>
+                            <div class="report-stat-box" style="border-left: none; background: transparent; padding: 0;">
+                                <div class="report-stat-title">Not Started</div>
+                                <div class="report-stat-value" style="color: #6c757d;">${newElements}</div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 15px;">
+                            <div class="readiness-meter">
+                                <div class="readiness-fill" style="width: ${readiness}%">
+                                    ${readiness > 10 ? readiness + '%' : ''}
+                                </div>
+                            </div>
+                            <div class="readiness-label">${readinessStatus}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            reportContent.innerHTML = html;
+        }
+
+        function startMode(mode) {
+            gameMode = mode;
+            modeSelector.classList.add('hidden');
+            gameContainer.classList.remove('hidden');
+            
+            if (mode === 'study') {
+                modeBadge.textContent = '📚 Study Mode';
+                modeBadge.classList.remove('test');
+                studyButtons.style.display = 'flex';
+            } else {
+                modeBadge.textContent = '✅ Test Mode';
+                modeBadge.classList.add('test');
+                studyButtons.style.display = 'none';
+            }
+            
+            initGame();
+        }
+
+        function initGame() {
+            // Initialize stats only for selected study set elements
+            elementStats = {};
+            const elementsToStudy = studySetElements && studySetElements.length > 0 
+                ? studySetElements 
+                : Object.keys(elements).map(Number);
+            
+            elementsToStudy.forEach(id => {
+                if (!elementStats[id]) {
+                    elementStats[id] = {
+                        attempts: 0,
+                        correct: 0,
+                        consecutiveCorrect: 0,
+                        lastSeen: 0,
+                        weight: 1.0
+                    };
+                }
+            });
+            
+            totalAnswered = 0;
+            sessionStartTime = Date.now();
+            gameScreen.style.display = 'block';
+            completeScreen.classList.remove('show');
+            
+            loadNextElement();
+        }
+
+        function selectNextElement() {
+            const masteryThreshold = gameMode === 'test' ? 1 : 2;
+            const unmastered = Object.keys(elementStats).map(Number).filter(id => 
+                elementStats[id].consecutiveCorrect < masteryThreshold
+            );
+
+            if (unmastered.length === 0) {
+                return null;
+            }
+
+            const weightedElements = unmastered.map(id => {
+                const stat = elementStats[id];
+                let weight = 1.0;
+
+                if (stat.attempts > 0) {
+                    const errorRate = 1 - (stat.correct / stat.attempts);
+                    weight += errorRate * 3;
+                }
+
+                if (stat.attempts === 0) {
+                    weight += 2;
+                }
+
+                const timeSinceLastSeen = Date.now() - stat.lastSeen;
+                if (timeSinceLastSeen < 30000) {
+                    weight *= 0.3;
+                }
+
+                return { id, weight };
+            });
+
+            const totalWeight = weightedElements.reduce((sum, el) => sum + el.weight, 0);
+            let random = Math.random() * totalWeight;
+            
+            for (const el of weightedElements) {
+                random -= el.weight;
+                if (random <= 0) {
+                    return el.id;
+                }
+            }
+
+            return weightedElements[0].id;
+        }
+
+        function loadNextElement() {
+            const nextId = selectNextElement();
+            
+            if (nextId === null) {
+                showComplete();
+                return;
+            }
+
+            currentElement = nextId;
+            elementStats[nextId].lastSeen = Date.now();
+            
+            elementNameInput.value = '';
+            elementSymbolInput.value = '';
+            elementNameInput.classList.remove('correct', 'incorrect');
+            elementSymbolInput.classList.remove('correct', 'incorrect');
+            
+            feedback.classList.remove('show', 'correct', 'incorrect', 'hint');
+            
+            submitBtn.disabled = false;
+            skipBtn.disabled = false;
+            hintBtn.disabled = false;
+            showAnswerBtn.disabled = false;
+            elementNameInput.disabled = false;
+            elementSymbolInput.disabled = false;
+            
+            updateStats();
+            
+            setTimeout(() => {
+                speakElement();
+                elementNameInput.focus();
+            }, 300);
+        }
+
+        function updateStats() {
+            const elementsToCount = studySetElements && studySetElements.length > 0 
+                ? studySetElements 
+                : Object.keys(elements).map(Number);
+            
+            const masteryThreshold = gameMode === 'test' ? 1 : 2;
+            const mastered = elementsToCount.filter(id => 
+                elementStats[id] && elementStats[id].consecutiveCorrect >= masteryThreshold
+            ).length;
+            const total = elementsToCount.length;
+            
+            document.getElementById('currentNum').textContent = totalAnswered + 1;
+            document.getElementById('correctNum').textContent = mastered;
+            document.getElementById('totalNum').textContent = total;
+            
+            const progress = (mastered / total) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function speakElement() {
+            const element = elements[currentElement];
+            
+            if (!element) {
+                console.error('Element not found:', currentElement);
+                return;
+            }
+            
+            if ('speechSynthesis' in window) {
+                speechSynthesis.cancel();
+                
+                // Just use the regular name - slow and clear
+                const utterance = new SpeechSynthesisUtterance(element.name);
+                utterance.rate = 0.6;  // Very slow for maximum clarity  
+                utterance.pitch = 1.0;
+                utterance.volume = 1.0;
+                utterance.lang = 'en-US';
+                
+                // Use the selected voice
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                }
+                
+                speechSynthesis.speak(utterance);
+            } else {
+                alert('Speech synthesis not supported in this browser.');
+            }
+        }
+
+        function showHint() {
+            const element = elements[currentElement];
+            let hint = '';
+            
+            hint = `Name starts with "${element.name[0]}" and symbol is "${element.symbol[0]}"`;
+            if (element.symbol.length > 1) {
+                hint += element.symbol[1];
+            }
+            
+            feedback.textContent = `💡 Hint: ${hint}`;
+            feedback.className = 'feedback show hint';
+            
+            hintBtn.disabled = true;
+        }
+
+        function showAnswer() {
+            const element = elements[currentElement];
+            
+            elementNameInput.value = element.name;
+            elementSymbolInput.value = element.symbol;
+            elementNameInput.classList.add('correct');
+            elementSymbolInput.classList.add('correct');
+            
+            feedback.textContent = `👁️ Answer: ${element.name} (${element.symbol})`;
+            feedback.className = 'feedback show hint';
+            
+            elementStats[currentElement].attempts++;
+            elementStats[currentElement].consecutiveCorrect = 0;
+            totalAnswered++;
+            
+            submitBtn.disabled = true;
+            skipBtn.disabled = true;
+            showAnswerBtn.disabled = true;
+            hintBtn.disabled = true;
+            elementNameInput.disabled = true;
+            elementSymbolInput.disabled = true;
+            
+            setTimeout(() => {
+                loadNextElement();
+            }, 2500);
+        }
+
+        function checkAnswer() {
+            const userElementName = elementNameInput.value.trim();
+            const userSymbol = elementSymbolInput.value.trim();
+            const correctElement = elements[currentElement];
+
+            if (!correctElement) {
+                console.error('Element not found:', currentElement);
+                loadNextElement();
+                return;
+            }
+
+            const nameCorrect = userElementName.toLowerCase() === correctElement.name.toLowerCase();
+            const symbolCorrect = userSymbol === correctElement.symbol;
+            const bothCorrect = nameCorrect && symbolCorrect;
+
+            elementStats[currentElement].attempts++;
+            if (bothCorrect) {
+                elementStats[currentElement].correct++;
+                elementStats[currentElement].consecutiveCorrect++;
+            } else {
+                elementStats[currentElement].consecutiveCorrect = 0;
+            }
+
+            elementNameInput.classList.remove('correct', 'incorrect');
+            elementSymbolInput.classList.remove('correct', 'incorrect');
+
+            if (nameCorrect) {
+                elementNameInput.classList.add('correct');
+            } else {
+                elementNameInput.classList.add('incorrect');
+            }
+
+            if (symbolCorrect) {
+                elementSymbolInput.classList.add('correct');
+            } else {
+                elementSymbolInput.classList.add('incorrect');
+            }
+
+            totalAnswered++;
+
+            if (bothCorrect) {
+                const consec = elementStats[currentElement].consecutiveCorrect;
+                const masteryThreshold = gameMode === 'test' ? 1 : 2;
+                if (consec >= masteryThreshold) {
+                    feedback.textContent = '✓ Mastered! 🎉';
+                } else {
+                    feedback.textContent = `✓ Correct! (${consec}/${masteryThreshold} to master)`;
+                }
+                feedback.className = 'feedback show correct';
+            } else {
+                let message = '✗ ';
+                if (!nameCorrect && !symbolCorrect) {
+                    message += `${correctElement.name} (${correctElement.symbol})`;
+                } else if (!nameCorrect) {
+                    message += `Name: ${correctElement.name}`;
+                } else {
+                    message += `Symbol: ${correctElement.symbol}`;
+                }
+                feedback.textContent = message;
+                feedback.className = 'feedback show incorrect';
+            }
+
+            submitBtn.disabled = true;
+            skipBtn.disabled = true;
+            hintBtn.disabled = true;
+            showAnswerBtn.disabled = true;
+            elementNameInput.disabled = true;
+            elementSymbolInput.disabled = true;
+            
+            setTimeout(() => {
+                loadNextElement();
+            }, bothCorrect ? 800 : 2000);
+        }
+
+        function skipQuestion() {
+            const correctElement = elements[currentElement];
+            
+            if (!correctElement) {
+                console.error('Element not found:', currentElement);
+                loadNextElement();
+                return;
+            }
+            
+            elementStats[currentElement].attempts++;
+            elementStats[currentElement].consecutiveCorrect = 0;
+            totalAnswered++;
+            
+            feedback.textContent = `⊘ ${correctElement.name} (${correctElement.symbol})`;
+            feedback.className = 'feedback show incorrect';
+            
+            submitBtn.disabled = true;
+            skipBtn.disabled = true;
+            hintBtn.disabled = true;
+            showAnswerBtn.disabled = true;
+            elementNameInput.disabled = true;
+            elementSymbolInput.disabled = true;
+            
+            setTimeout(() => {
+                loadNextElement();
+            }, 2000);
+        }
+
+        function showComplete() {
+            gameScreen.style.display = 'none';
+            completeScreen.classList.add('show');
+            
+            const totalAttempts = Object.values(elementStats).reduce((sum, s) => sum + s.attempts, 0);
+            const totalCorrect = Object.values(elementStats).reduce((sum, s) => sum + s.correct, 0);
+            const accuracy = totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0;
+            
+            const timeSpent = Math.round((Date.now() - sessionStartTime) / 1000 / 60);
+            
+            document.getElementById('finalScore').textContent = `${Object.keys(elements).length} elements mastered • ${accuracy}% accuracy`;
+            document.getElementById('finalAccuracy').textContent = `${timeSpent} minutes`;
+        }
+
+        // Event listeners
+        submitBtn.addEventListener('click', checkAnswer);
+        skipBtn.addEventListener('click', skipQuestion);
+        hintBtn.addEventListener('click', showHint);
+        showAnswerBtn.addEventListener('click', showAnswer);
+        playAudioBtn.addEventListener('click', speakElement);
+        restartBtn.addEventListener('click', () => {
+            gameContainer.classList.add('hidden');
+            mainMenu.classList.remove('hidden');
+            completeScreen.classList.remove('show');
+            currentStudySetId = null;
+            studySetElements = [];
+        });
+
+        elementNameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                if (elementSymbolInput.disabled) {
+                    return;
+                }
+                elementSymbolInput.focus();
+            }
+        });
+
+        elementSymbolInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !submitBtn.disabled) {
+                checkAnswer();
+            }
+        });
+    </script>
+</body>
+</html>
 
